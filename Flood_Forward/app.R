@@ -8,28 +8,47 @@
 #
 
 library(shiny)
+library(tidyverse)
+library(shinythemes)
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme("cerulean"),
+                
+    navbarPage("Flood Forward",
+               tabPanel("Home",
+                        titlePanel("Flood Forward")),
+               tabPanel("About the Project"),
+               tabPanel("Data"),
+               tabPanel("Study Area Overview",
+                        sidebarLayout(
+                            sidebarPanel(
+                                checkboxGroupInput("overview_map",
+                                                   "Select layer(s)",
+                                                   choices = c("County", "Subbasins", "Watersheds", "Riparian"),
+                                                   selected = NULL)
+                            ),
+                            mainPanel()
+                        )),
+               tabPanel("Flood Risk Analysis"),
+               tabPanel("Ecosystem Enhancement Analysis"),
+               tabPanel("Multiple Benefit Weighting",
+                        # Sidebar with a slider input for number of bins 
+                        sidebarLayout(
+                            sidebarPanel(
+                                sliderInput("bins",
+                                            "Number of bins:",
+                                            min = 1,
+                                            max = 50,
+                                            value = 30)
+                            ),
+                            
+                            # Show a plot of the generated distribution
+                            mainPanel(
+                                plotOutput("distPlot")
+                            )
+                        )),
+               tabPanel("Contact Us")),           
 
-    # Application title
-    titlePanel("Old Faithful Geyser Data"),
-
-    # Sidebar with a slider input for number of bins 
-    sidebarLayout(
-        sidebarPanel(
-            sliderInput("bins",
-                        "Number of bins:",
-                        min = 1,
-                        max = 50,
-                        value = 30)
-        ),
-
-        # Show a plot of the generated distribution
-        mainPanel(
-           plotOutput("distPlot")
-        )
-    )
 )
 
 # Define server logic required to draw a histogram
