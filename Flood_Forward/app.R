@@ -29,23 +29,39 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                             ),
                             mainPanel()
                         )),
-               tabPanel("Flood Risk Analysis"),
-               tabPanel("Ecosystem Enhancement Analysis"),
+               tabPanel("Flood Risk Analysis",
+                        sidebarLayout(
+                            sidebarPanel(
+                                checkboxGroupInput("flood_risk_map",
+                                                   "Select Flood Risk result(s)",
+                                                   choices = c("Final Priority Ranking", "FEMA Flood Hazard", "Catchment Area", "Fire Hazard", "Disadvantaged Communities", "Levee Failures"),
+                                                   selected = "Final Priority Ranking")
+                            ),
+                            mainPanel()
+                        )),
+               tabPanel("Ecosystem Enhancement Analysis",
+                        sidebarLayout(
+                            sidebarPanel(
+                                checkboxGroupInput("ecosystem_priority_map",
+                                                   "Select Ecosystem Priority result(s)",
+                                                   choices = c("Final Priority Ranking", "Groundwater-Dependent Ecosystems", "Critical Habitats", "Native Fish Species"),
+                                                   selected = "Final Priority Ranking")
+                            ),
+                            mainPanel()
+                        )),
                tabPanel("Multiple Benefit Weighting",
                         # Sidebar with a slider input for number of bins 
                         sidebarLayout(
                             sidebarPanel(
-                                sliderInput("bins",
-                                            "Number of bins:",
+                                sliderInput("Multi-benefit Priority",
+                                            "Select preferences:",
                                             min = 1,
-                                            max = 50,
-                                            value = 30)
+                                            max = 3,
+                                            value = 2)
                             ),
                             
                             # Show a plot of the generated distribution
-                            mainPanel(
-                                plotOutput("distPlot")
-                            )
+                            mainPanel()
                         )),
                tabPanel("Contact Us")),           
 
