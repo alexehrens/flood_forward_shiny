@@ -19,20 +19,21 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 
 ### read in shapefiles
-county <- read_sf(here("Flood_Forward", "transfer_for_shiny", "county_boundary_project", "county_boundary_project.shp")) %>% 
+county <- st_read(here("Flood_Forward", "transfer_for_shiny", "county_boundary_project", "county_boundary_project.shp")) %>% 
     clean_names()
 
-chowchilla <- read_sf(here("Flood_Forward", "transfer_for_shiny", "chowchilla_project", "chowchilla_project.shp"))
+chowchilla <- st_read(here("Flood_Forward", "transfer_for_shiny", "chowchilla_project", "chowchilla_project.shp"))
 
-madera <- read_sf(here("Flood_Forward", "transfer_for_shiny", "madera_project", "madera_project.shp"))
+madera <- st_read(here("Flood_Forward", "transfer_for_shiny", "madera_project", "madera_project.shp"))
 
 subbasins <- rbind(chowchilla, madera) %>% 
     rename("name" = "Basin_Su_1")
 
-nhd_flowlines <- read_sf(here("Flood_Forward", "transfer_for_shiny", "nhd_flowlines", "nhd_flowlines.shp"))
+nhd_flowlines <- st_read(here("Flood_Forward", "transfer_for_shiny", "nhd_flowlines", "nhd_flowlines.shp"))
 
-watersheds <- read_sf(here("Flood_Forward", "transfer_for_shiny", "watersheds_dissolve", "watersheds_dissolve.shp"))
+watersheds <- st_read(here("Flood_Forward", "transfer_for_shiny", "watersheds_dissolve", "watersheds_dissolve.shp"))
 
+# flood risk shapefile
 watershed_ranks <- watersheds %>% 
     mutate(final_priority_ranking = case_when(
         watersheds$Name == "Ash Slough" ~ 2,
@@ -122,7 +123,7 @@ ecosystems_all <- ecosystems_join3 %>%
     dplyr::select(x, y, ecosystem_priority_rank, gde_score, crit_habitat_score, native_fish_reclass)
 
 # Define UI for application that draws a histogram
-ui <- fluidPage(theme = shinytheme("cerulean"),
+ui <- fluidPage(theme = shinytheme("flatly"),
                 
     navbarPage("Flood Forward",
                tabPanel("Home",
@@ -130,11 +131,11 @@ ui <- fluidPage(theme = shinytheme("cerulean"),
                tabPanel("About the Project",
                         titlePanel("The Project"),
                         "This project looks at the flood risk reduction, and ecosystem enhancement benefits of floodplain restoration from flood managed aquifer recharge in Madera County, California. Flood Managed Aquifer Recharge (Flood-MAR) is an integrated water resource management strategy that utilizes floodwaters, from or in anticipation of, precipitation events for managed aquifer recharge. Flood-MAR provides an opportunity to simultaneously reduce flood risk during storm events and recharge underlying aquifers to increase the state’s drought-resilient water supply, while enhancing natural ecosystems.",
-                        mainPanel(imageOutput("flood_mar")),
+                        img(src = "pics/floodMAR_diagram.jpg",
+                                  width = 400,
+                                  align = "left"),
                         titlePanel("Motivation"),
-                        "California water resource managers must adapt their strategies in storing, transferring, and managing fresh water supplies. Climate change is projected to cause highly variable weather that will make old water management strategies obsolete. New management strategies are required to adapt to intensified flood risk events.  Droughts and more extreme precipitation events are projected to occur. Additionally, precipitation is expected to fall more as rain instead of snow, reducing the reliance on the Sierra snowpack as a reliable source of freshwater storage. 
-                        
-                        Another motivation for this project is to advocate for the sustainable management of groundwater. Groundwater accounts for 43% of the average water supply in California during normal years. In years of drought, Central Valley farmers and residents rely on groundwater for as much as 70% of water supply. Extreme drought coupled with the demand for irrigating crops has led to the unsustainable extraction of groundwater causing aquifers to deteriorate."),
+                        "California water resource managers must adapt their strategies in storing, transferring, and managing fresh water supplies. Climate change is projected to cause highly variable weather that will make old water management strategies obsolete. New management strategies are required to adapt to intensified flood risk events. Droughts and more extreme precipitation events are projected to occur. Additionally, precipitation is expected to fall more as rain instead of snow, reducing the reliance on the Sierra snowpack as a reliable source of freshwater storage. Another motivation for this project is to advocate for the sustainable management of groundwater. Groundwater accounts for 43% of the average water supply in California during normal years. In years of drought, Central Valley farmers and residents rely on groundwater for as much as 70% of water supply. Extreme drought coupled with the demand for irrigating crops has led to the unsustainable extraction of groundwater causing aquifers to deteriorate."),
                tabPanel("Data"),
                tabPanel("Study Area Overview",
                         tmapOutput("madera_overview_tmap"),
