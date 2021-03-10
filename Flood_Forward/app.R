@@ -127,11 +127,12 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 
     navbarPage("Flood Forward",
                tabPanel("Home",
-                        titlePanel("Flood Forward"),
+                        titlePanel(h1("Flood Forward", align = "center")),
                         img(src = "hensley_lake.jpg",
+                            style="display: block; margin-left: auto; margin-right: auto;",
                             width = "100%",
-                            height = "75%"),
-                        "Image Credit: Michael J. Nevins"),
+                            height = "650"),
+                        "Hensley Lake, Madera County. Image Credit: Michael J. Nevins"),
                tabPanel("About the Project",
                         titlePanel("The Project"),
                         "This project looks at the flood risk reduction, and ecosystem enhancement benefits of floodplain restoration from flood managed aquifer recharge in Madera County, California. Flood Managed Aquifer Recharge (Flood-MAR) is an integrated water resource management strategy that utilizes floodwaters, from or in anticipation of, precipitation events for managed aquifer recharge. Flood-MAR provides an opportunity to simultaneously reduce flood risk during storm events and recharge underlying aquifers to increase the state’s drought-resilient water supply, while enhancing natural ecosystems.",
@@ -191,7 +192,12 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                             # Show a plot of the generated distribution
                             mainPanel()
                         )),
-               tabPanel("Contact Us")),           
+               tabPanel("Contact Us",
+                        titlePanel(h1("The Team", align = "center")),
+                        img(src = "squad.png",
+                            style="display: block; margin-left: auto; margin-right: auto;",
+                            width = "75%",
+                            height = "75%"))),           
 
 )
 
