@@ -19,6 +19,10 @@ library(rnaturalearth)
 library(rnaturalearthdata)
 
 ### read in shapefiles
+### read in earth background layer
+earth <- ne_countries(scale = "medium", returnclass = "sf") %>%
+    st_as_sf()
+
 county <-
     st_read(
         here(
@@ -28,7 +32,8 @@ county <-
             "county_boundary_project.shp"
         )
     ) %>%
-    clean_names()
+    clean_names() %>% 
+    st_transform(crs = crs(earth))
 
 chowchilla <-
     st_read(
@@ -38,7 +43,8 @@ chowchilla <-
             "chowchilla_project",
             "chowchilla_project.shp"
         )
-    )
+    ) %>% 
+    st_transform(crs = crs(earth))
 
 madera <-
     st_read(
@@ -48,7 +54,8 @@ madera <-
             "madera_project",
             "madera_project.shp"
         )
-    )
+    ) %>% 
+    st_transform(crs = crs(earth))
 
 subbasins <- rbind(chowchilla, madera) %>%
     rename("name" = "Basin_Su_1")
@@ -59,7 +66,8 @@ nhd_flowlines <-
         "transfer_for_shiny",
         "nhd_flowlines",
         "nhd_flowlines.shp"
-    ))
+    )) %>% 
+    st_transform(crs = crs(earth))
 
 watersheds <-
     st_read(
@@ -69,7 +77,8 @@ watersheds <-
             "watersheds_dissolve",
             "watersheds_dissolve.shp"
         )
-    )
+    ) %>% 
+    st_transform(crs = crs(earth))
 
 # flood risk shapefile
 watershed_ranks <- watersheds %>%
@@ -90,6 +99,9 @@ watershed_ranks <- watersheds %>%
 ### read in earth background layer
 earth <- ne_countries(scale = "medium", returnclass = "sf") %>%
     st_as_sf()
+
+### read in basemap
+#basemap <- get_map(location = c(-121, 36, -118, 40), maptype = "terrain", source = "stamen", zoom = 8)
 
 ### read in ecosystems rasters
 ecosystem_priority_rast <-
@@ -306,35 +318,22 @@ ui <- fluidPage(
             )
         ),
         tabPanel(
-            "Multiple Benefit Weighting",
-            # Sidebar with a slider input for number of bins
-            sidebarLayout(sidebarPanel(
-                selectInput("watersheds",
-                            "Select Watershed of Interest",
-                            choices = c(
-                                "Ash Slough",
-                                "Berenda Slough",
-                                "Berenda Creek",
-                                "Buttonwillow Slough",
-                                "Chowchilla River",
-                                "Cottonwood Creek",
-                                "Dry Creek",
-                                "Fresno River",
-                                "San Joaquin River"
-                            ),
-                            selected = "San Joaquin River"),
-                numericInput(
-                    "top_sites",
-                    "Select % of the best sites you want to see:",
-                    min = 1,
-                    max = 100,
-                    value = 100
-                )
-            ),
+            "Recommended Sites",
+            sidebarLayout(
+                sidebarPanel(
+                    numericInput(
+                        "top_sites",
+                        "Select % of the best sites you want to see:",
+                        min = 1,
+                        max = 100,
+                        value = 100
+                    )
+                ),
             
             # Show a plot of the generated distribution
             mainPanel("Sensitivity Analysis Results",
-                      plotOutput("sa_plot")))
+                      plotOutput("sa_plot"))
+            )
         ),
         tabPanel(
             "Contact Us",
@@ -386,9 +385,21 @@ server <- function(input, output) {
             rename("column_name" = input$flood_risk)
     })
     
-    output$floods_plot <- renderPlot({
+    floods_map <- reactive({
         ggplot(data = floods_select()) +
-            geom_sf(aes(fill = column_name))
+            geom_sf(aes(fill = column_name)) +
+            labs(fill = case_when(
+                input$flood_risk == "final_priority_ranking" ~ "Flood Hazard Priority Ranking",
+                input$flood_risk == "flood_area" ~ "FEMA Flood Hazard Area (ac)",
+                input$flood_risk == "AreaAcres" ~ "Total Catchment Area (ac)",
+                input$flood_risk == "fire_area_" ~ "Fire Hazard Area (ac)",
+                input$flood_risk == "area_DAC_a" ~ "Disadvantaged Communitieis Area (ac)",
+                input$flood_risk == "Levee_fail" ~ "Number of Levee Failures")) +
+            theme_void()
+    })
+    
+    output$floods_plot <- renderPlot({
+        floods_map()
     })
     
     ### 3) ecosystem priority analysis reactive map
@@ -400,10 +411,10 @@ server <- function(input, output) {
     
     output$ecosystems_plot <- renderPlot({
         ggplot() +
-            geom_sf(data = earth, fill = "white") +
+            geom_sf(data = subbasins, fill = "darkgray")  +
             coord_sf(
-                xlim = c(-120.45, -119.715),
-                ylim = c(36.8, 37.18),
+                xlim = c(-120.56, -119.7),
+                ylim = c(36.79, 37.2),
                 expand = 0
             ) +
             geom_tile(data = ecosystems_select(), aes(
@@ -418,16 +429,11 @@ server <- function(input, output) {
                 "lightgreen",
                 "darkgreen"
             )) +
-            theme_bw()
+            theme_void()+
+            labs(fill = "Priority Ranking")
     })
     
     ######## 4) sensitivity analysis results
-#    sa_select <- reactive({
-#        st_zm(sa_df) %>% 
-#            st_filter(st_zm(watershed_select()),
-#                      join = st_within)
-#    })
-    
     prop <- reactive({
         input$top_sites / 100
     })
@@ -440,13 +446,23 @@ server <- function(input, output) {
     
     output$sa_plot <- renderPlot({
         ggplot() +
-            geom_sf(data = earth, fill = "white") +
+            geom_sf(data = subbasins, fill = "darkgray")  +
             coord_sf(
-                xlim = c(-120.45, -119.715),
-                ylim = c(36.8, 37.18),
-                expand = 0)+
+                xlim = c(-120.56, -119.7),
+                ylim = c(36.79, 37.2),
+                expand = 0
+            ) +
             geom_tile(data = sa_top(),
-                      aes(x = x, y = y, fill = sensitivity_analysis_results))
+                      aes(x = x, y = y, fill = sensitivity_analysis_results)) +
+            scale_fill_gradientn(colors = c(
+                "firebrick",
+                "orange",
+                "gold",
+                "lightgreen",
+                "darkgreen"
+            ))+
+            theme_void()+
+            labs(fill = "Sensitivity Analysis Score")
     })
 
 }
