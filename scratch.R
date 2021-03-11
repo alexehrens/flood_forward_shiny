@@ -41,3 +41,39 @@ floods_select <- watersheds %>%
       tm_shape(nhd_flowlines)+
       tm_lines(col = "blue")
   })
+  
+  
+  ### 1) Study Area Overview tmap - test
+  watershed_select <-watersheds %>% 
+      filter(Name == "Fresno River")
+  
+  nhd_select <- st_zm(nhd_flowlines) %>% 
+      st_filter(st_zm(watershed_select),
+                join = st_within)
+
+  ggplot() +
+    geom_sf(data = watershed_select)+
+    geom_sf(data = nhd_select)
+  
+  watershed_mask <- extent(watershed_select)
+  
+  sa_select <- sa_rast %>% 
+    setExtent(ext = watershed_mask)
+  
+  sa_select_df <- rasterToPoints(sa_select) %>% 
+    as.data.frame()
+  
+  ggplot() +
+    geom_sf(data = watershed_select)+
+    geom_raster(data = sa_select)
+  
+  
+  sa_top <- sa_df %>% 
+    filter(sensitivity_analysis_results > 0) %>% 
+      slice_max(order_by = sensitivity_analysis_results, prop = 0.99)
+  
+  output$sa_plot <- renderPlot({
+    ggplot(data = sa_top()) +
+      geom_tile(aes(x = x, y = y, fill = sensitivity_analysis_results))
+  })
+  
