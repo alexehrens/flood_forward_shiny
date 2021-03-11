@@ -309,13 +309,22 @@ ui <- fluidPage(
                             "Native Fish Species" = "native_fish_reclass"
                         ),
                         selected = ("Ecosystem Priority Ranking" = "ecosystem_priority_rank")
-                    )
+                    ),
+                    "The ecosystem enhancement results provide insight into which sites within Madera and Chowchilla Sub Basins have significant ecosystems that could be enhanced through floodplain restoration and groundwater recharge projects. Ecosystem enhancement priorities were determined using a combination of three parameters: proximity to groundwater-dependent ecosystems, proximity to critical habitats for endangered or threatened species, and the richness of native fish species in each HUC12 watershed. Click on the tabs to see the results from each of these parameters as well as an overall ecosystem prioritization score."
                 ),
                 mainPanel(
                     "Ecosystem Enhancement Analysis Results",
                     plotOutput("ecosystems_plot")
                 )
-            )
+            ),
+            titlePanel("Results"),
+            "Areas with the closest proximity to GDEs are along the major stream channels that cut from northeast to southwest across the Madera and Chowchilla Subbasins. This includes significant portions of Berenda Slough, Berenda Creek, Dry Creek, Fresno River, and Cottonwood Creek. Some of these areas even have distances of 0 meters from GDEs, which would make them the highest priority for locating groundwater recharge projects with the ecosystem enhancement benefit. 
+
+The critical habitats for endangered or threatened species from the US Fish and Wildlife Service dataset were mostly located along the north and eastern boundaries of the study area. High priority areas were distributed across each of the major streams in the study area, all of which showed the same pattern of high priority in the east and low priority in the west.
+
+The highest fish species richness are located along the San Joaquin River at the southern boundary of Madera Subbasin. The major streams in the Chowchilla Subbasin (Chowchilla River, Ash Slough, Berenda Slough) all show high species richness of native fish. 
+
+Much of the highest priority sites are on the northeastern end of the Chowchilla Subbasin on Berenda Slough and the northernmost end of the Chowchilla River and Ash Slough. Some areas of high priority can be seen in Madera Subbasin as well, on sections of the Fresno River, Cottonwood Creek, and the San Joaquin River. These locations represent the best options for achieving ecosystem enhancement benefits from groundwater recharge projects."
         ),
         tabPanel(
             "Recommended Sites",
