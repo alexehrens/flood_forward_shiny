@@ -246,7 +246,7 @@ ui <- fluidPage(
             titlePanel("The Project"),
             "This project looks at the flood risk reduction, and ecosystem enhancement benefits of floodplain restoration from flood managed aquifer recharge in Madera County, California. Flood Managed Aquifer Recharge (Flood-MAR) is an integrated water resource management strategy that utilizes floodwaters, from or in anticipation of, precipitation events for managed aquifer recharge. Flood-MAR provides an opportunity to simultaneously reduce flood risk during storm events and recharge underlying aquifers to increase the state’s drought-resilient water supply, while enhancing natural ecosystems.",
             img(src = "floodMAR_diagram.jpg",
-                width = 400,
+                width = 600,
                 align = "left"),
             titlePanel("Motivation"),
             "California water resource managers must adapt their strategies in storing, transferring, and managing fresh water supplies. Climate change is projected to cause highly variable weather that will make old water management strategies obsolete. New management strategies are required to adapt to intensified flood risk events. Droughts and more extreme precipitation events are projected to occur. Additionally, precipitation is expected to fall more as rain instead of snow, reducing the reliance on the Sierra snowpack as a reliable source of freshwater storage. Another motivation for this project is to advocate for the sustainable management of groundwater. Groundwater accounts for 43% of the average water supply in California during normal years. In years of drought, Central Valley farmers and residents rely on groundwater for as much as 70% of water supply. Extreme drought coupled with the demand for irrigating crops has led to the unsustainable extraction of groundwater causing aquifers to deteriorate."
@@ -277,8 +277,7 @@ ui <- fluidPage(
             ####################### Study Area Overview page ###################################
             "Study Area Overview",
             titlePanel("About Madera County"),
-            "The project focuses specifically in Madera County, which includes the Madera Basin and a large portion of the Chowchilla Basin. Groundwater is an essential source of water for agricultural, domestic, municipal, industrial, and environmental sectors of Madera County, which has a population of over 156,000 people. The largest economic sector in Madera is agriculture, which utilizes 500,000 acre feet of groundwater each year, providing commodities to the nation and generating at least $2 billion annually for the county. Madera is vulnerable to flood risk. There were 6-7 major flooding events from 1978 - 2009. Climate change is likely to increase this number of flooding disasters in Madera, as precipitation will fall more as rain, and in more intense bursts. Additionally, Madera has lost over 90% of its floodplain habitat. Restoring this critical resource will help reduce flood risk throughout the county. Madera Basin is identified as critically overdrafted. To comply with SGMA, groundwater sustainability agencies (GSAs) in the Basin were required to develop a groundwater sustainability plan (GSP).",
-            p("The figure below shows the location of Madera County within the state of California, and shows the locations of its two groundwater subbasins, Chowchilla and Madera, within the county."),
+            "The project focuses specifically in Madera County, which includes the Madera Basin and a large portion of the Chowchilla Basin. Groundwater is an essential source of water for agricultural, domestic, municipal, industrial, and environmental sectors of Madera County, which has a population of over 156,000 people. The largest economic sector in Madera is agriculture, which utilizes 500,000 acre feet of groundwater each year, providing commodities to the nation and generating at least $2 billion annually for the county. Madera is vulnerable to flood risk. There were 6-7 major flooding events from 1978 - 2009. Climate change is likely to increase this number of flooding disasters in Madera, as precipitation will fall more as rain, and in more intense bursts. Additionally, Madera has lost over 90% of its floodplain habitat. Restoring this critical resource will help reduce flood risk throughout the county. Madera Basin is identified as critically overdrafted. To comply with SGMA, groundwater sustainability agencies (GSAs) in the Basin were required to develop a groundwater sustainability plan (GSP). The figure below shows the location of Madera County within the state of California, and shows the locations of its two groundwater subbasins, Chowchilla and Madera, within the county.",
             img(src = "area_of_interest.png",
                 width = 800,
                 style = "display: block; margin-left: auto; margin-right: auto;"),
@@ -299,11 +298,20 @@ ui <- fluidPage(
                                 "Fresno River",
                                 "San Joaquin River"
                             ),
-                            selected = "San Joaquin River"),
+                            selected = "Cottonwood Creek"),
                 "Selecting a watershed will display the boundary of that watershed and the streams and tributaries that intersect its boundary."
             ),
         mainPanel(tmapOutput("madera_overview_tmap"))
-        )),
+        ),
+        p(" "),
+        p(" "),
+        p(" "),
+        p(" "),
+        p(" "),
+        p(" "),
+        p(" "),
+        p(" "),
+        ),
         tabPanel(
             ############################## Flood Risk Analysis ##################################################
             "Flood Risk Analysis",
@@ -346,7 +354,7 @@ ui <- fluidPage(
             p("The ecosystem enhancement results provide insight into which sites within Madera and Chowchilla Sub Basins have significant ecosystems that could be enhanced through floodplain restoration and groundwater recharge projects. Ecosystem enhancement priorities were determined using a combination of three parameters: proximity to groundwater-dependent ecosystems, proximity to critical habitats for endangered or threatened species, and the richness of native fish species in each HUC12 watershed. Results from each of these parameters were combined to produce the Final Ecosystem Priority Ranking, which ranks riparian sites that are within a 50-meter floodplain from major stream channels."),
             p(h4(strong("The Variables"))),
             p(strong("Groundwater-dependent ecosystems: "), "Groundwater-dependent ecosystems (GDEs) are ecological communities or species that require groundwater to meet some or all of their water needs. These generally follow major stream corridors. For our analysis, we ranked our delineated riparian areas based on their proximity to these ecosystems - the closest areas are given higher priority than those further away."),
-            p(strong("Critical habitats: "), "Critical habitats for federally endangered or threatened species are another important ecosystem to protect and enhance. We prioritized riparian areas that were closer to these critical habitats over areas taht were further away."),
+            p(strong("Critical habitats: "), "Critical habitats for federally endangered or threatened species are another important ecosystem to protect and enhance. We prioritized riparian areas that were closer to these critical habitats over areas that were further away."),
             p(strong("Native fish species: "), "Finally we wanted to rank riparian areas by the richness of native fish species that are found in their respective watersheds. We ranked areas with greater fish species richness higher than those with fewer native fish species."),
             titlePanel("Ecosystem Enhancement Analysis Results"),
             sidebarLayout(
@@ -439,9 +447,9 @@ server <- function(input, output) {
             "OpenStreetMap"
         ))
         
-        tm_shape(watershed_select()) +
+        tm_shape(watershed_select(), name = "Watersheds") +
             tm_polygons("Name") +
-            tm_shape(nhd_select()) +
+            tm_shape(nhd_select(), name = "NHD Stream Layer") +
             tm_lines(col = "blue")
     })
     
