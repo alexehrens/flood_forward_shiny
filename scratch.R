@@ -107,3 +107,15 @@ floods_select <- watersheds %>%
         "darkgreen"
       )) +
       theme_minimal()
+      
+      ggplot(data = floods_select()) +
+        geom_sf(aes(fill = column_name)) +
+        scale_fill_brewer(palette = "Reds", continuous_scale()) +
+        labs(fill = case_when(
+          input$flood_risk == "final_priority_ranking" ~ "Flood Hazard Priority Ranking",
+          input$flood_risk == "flood_area" ~ "FEMA Flood Hazard Area (ac)",
+          input$flood_risk == "AreaAcres" ~ "Total Catchment Area (ac)",
+          input$flood_risk == "fire_area_" ~ "Fire Hazard Area (ac)",
+          input$flood_risk == "area_DAC_a" ~ "Disadvantaged Communitieis Area (ac)",
+          input$flood_risk == "Levee_fail" ~ "Number of Levee Failures")) +
+        theme_void()
