@@ -383,12 +383,33 @@ ui <- fluidPage(
             p("Much of the highest priority sites are on the northeastern end of the Chowchilla Subbasin on Berenda Slough and the northernmost end of the Chowchilla River and Ash Slough. Some areas of high priority can be seen in Madera Subbasin as well, on sections of the Fresno River, Cottonwood Creek, and the San Joaquin River. These locations represent the best options for achieving ecosystem enhancement benefits from groundwater recharge projects.")
         ),
         tabPanel(
-            ############### Recommended Sites ######################################
-            "Recommended Sites",
-            titlePanel("Recommended Sites"),
-            p(h4(strong("Multiple-Benefit Weighting"))),
+            ############### Tradeoff Analysis ######################################
+            "Tradeoff Analysis",
+            titlePanel("Tradeoff Analysis - Multiple-Benefit Weighting"),
+          #  p(h4(strong("Multiple-Benefit Weighting"))),
             p("After completing our flood risk and ecosystem analyses, results were combined with an analysis of site suitability to determine  areas most suitable for achieving groundwater recharge with flood risk reduction or ecosystem enhancement benefits. For our final output, we combined the results for site-suitable flood risk or ecosystems benefit using a multiple-benefit weighted sum that can be changed to reflect differences in user preferences. For example, a flood control agency may have no interest in enhancing ecosystems and choose to only look at flood risk reduction as their desired co-benefit when making decisions on groundwater recharge project siting. For the purposes of this app, the scenario in which flood risk reduction and ecosystem enhancement benefits are given equal (50-50) weighting."),
-            p(h4(strong("Sensitivity Analysis"))),
+          titlePanel("Tradeoff Analysis Results"),
+          sidebarLayout(
+              sidebarPanel(
+                 sliderInput(
+                     "tradeoff",
+                     "Select desired multiple-benefit tradeoff weighting",
+                     min = 0,
+                     max = 100,
+                     value = 50,
+                     step = 25
+                 ), 
+                 "The number selected corresponds to the percentage of weighting assigned to the ecosystems enhancement benefit relative to the flood risk reduction benefit. For example, an selection of 0 means 0% ecosystems and therefore 100% flood risk weighting, whereas a selection of 75 means 75% ecosystems and 25% flood risk weighting."
+              ),
+              mainPanel(
+                  
+              )
+          )),
+        tabPanel(
+            ############## Sensitivity Analysis ###################################
+            "Sensitivity Analysis",
+            titlePanel("Sensitivity Analysis"),
+           # p(h4(strong("Sensitivity Analysis"))),
             p("The last step of our project was to perform a sensitivity analysis to determine how the spatial distribution of priority sites would change with changes in each of the analyses variables. In this analysis, each variable for both flood risk and ecosystem analyses were set to either 0% or 100% weighting to test how that change impacted final site recommendation results. Since there were 5 flood risk and 3 ecosystem variables, each tested at 0% and 100% weighting, this analysis was performed a total of 16 times. Using raster analysis in Rstudio, the 16 outcomes were analyzed to determine how many times each raster cell appeared as a high priority site. The number reported in the figure below are the total number of times a given cell resulted in a high priority score, ranging from 0 to 16. Sites with scores of 16 consistently showed up as the 'best' sites for multiple-benefit groundwater recharge projects no matter how any of the input variables were changed. Those sites are considered the top and most recommended sites in Madera County for groundwater recharge projects with flood risk reduction and ecosystem enhancement benefits."),
             titlePanel("Sensitivity Analysis Results - Top Recommended Sites"),
             sidebarLayout(
@@ -402,8 +423,8 @@ ui <- fluidPage(
                     ),
                     "The number selected corresponds to the percentage of the top sites that will display in the figure to the right. For example, entering 20 will result in the top 20% of sites being displayed."
                 ),
-            mainPanel(
-                      plotOutput("sa_plot"))
+                mainPanel(
+                    plotOutput("sa_plot"))
             )
         ),
         tabPanel(
@@ -538,13 +559,17 @@ server <- function(input, output) {
             ) +
             geom_tile(data = sa_top(),
                       aes(x = x, y = y, fill = sensitivity_analysis_results)) +
-            scale_fill_gradientn(colors = c(
-                "firebrick",
-                "orange",
-                "gold",
-                "limegreen",
-                "darkgreen"
-            ))+
+            scale_fill_gradientn(colors = case_when(
+            #    sa_top()$sensitivity_analysis_results >= 12 ~ "firebrick",
+            #    sa_top()$sensitivity_analysis_results < 12 & sa_top()$sensitivity_analysis_results >= 8 ~ "orange",
+            #    sa_top()$sensitivity_analysis_results < 8 & sa_top()$sensitivity_analysis_results >= 4 ~ "limegreen",
+            #    sa_top()$sensitivity_analysis_results < 4 ~ "darkgreen"))+
+                prop() >= 0.8 ~ c("firebrick","orange","gold","limegreen","darkgreen"),
+                prop() < 0.8 & prop() >= 0.6 ~ c("orange", "gold", "gold", "limegreen", "darkgreen"),
+                prop() < 0.6 & prop() >= 0.4 ~ c("gold", "gold", "limegreen", "darkgreen", "darkgreen"),
+                prop() < 0.4 & prop() >= 0.2 ~ c("limegreen", "limegreen", "darkgreen", "darkgreen", "darkgreen"),
+                prop() < 0.2 ~ c("darkgreen", "darkgreen", "darkgreen", "darkgreen", "darkgreen")
+                ))+
             theme_void()+
             labs(fill = "Sensitivity Analysis Score")
     })
