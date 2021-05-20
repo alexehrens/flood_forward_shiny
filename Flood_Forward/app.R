@@ -391,18 +391,19 @@ ui <- fluidPage(
           titlePanel("Tradeoff Analysis Results"),
           sidebarLayout(
               sidebarPanel(
-                 sliderInput(
-                     "tradeoff",
-                     "Select desired multiple-benefit tradeoff weighting",
-                     min = 0,
-                     max = 100,
-                     value = 50,
-                     step = 25
+                 radioButtons(
+                     inputId = "tradeoff",
+                     "Select desired multiple-benefit tradeoff scenario",
+                     choices = c("Flood Risk Reduction" = "floods100", 
+                                 "Equal Weighting" = "equal50", 
+                                 "Ecosystem Enhancement" = "ecosystems100"
+                                 ),
+                     selected = ("Equal Weighting" = "equal50")
                  ), 
-                 "The number selected corresponds to the percentage of weighting assigned to the ecosystems enhancement benefit relative to the flood risk reduction benefit. For example, an selection of 0 means 0% ecosystems and therefore 100% flood risk weighting, whereas a selection of 75 means 75% ecosystems and 25% flood risk weighting."
+                 "The Flood Risk Reduction scenario corresponds to multiple-benefit weighting of 100% to flood risk reduction and 0% ecosystem enhancement. The Ecosystem Enhancement scenario corresponds to weighting of 0% to flood risk and 100% to ecosystems. The Equal Weighting scenario assigns 50% weighting to both co-benefits. Plots display the top 10 largest contiguous areas of high priority sites from each scenario."
               ),
               mainPanel(
-                  
+                  uiOutput("tradeoff_image")
               )
           )),
         tabPanel(
@@ -535,7 +536,34 @@ server <- function(input, output) {
     
     ####################################################################################
     
-    ######## 4) sensitivity analysis results ###########################################
+    ######### 4) tradeoff analysis results #############################################
+    tradeoff_select <- reactive({
+        input$tradeoff
+    })
+    
+    output$tradeoff_image <- renderUI({
+        if(tradeoff_select()=="floods100")
+            img(src="flood_final_output_top10.png", 
+                style = "display: block; margin-left: auto; margin-right: auto;", 
+                width = "75%", 
+                height = "75%")
+        else if(tradeoff_select()=="equal50")
+            img(src = "equal_benefits_final_output_top10.png",
+                style = "display: block; margin-left: auto; margin-right: auto;",
+                width = "75%",
+                height = "75%")
+        else if(tradeoff_select()=="ecosystems100")
+            img(
+                src = "ecosystems_final_output_top10.png",
+                style = "display: block; margin-left: auto; margin-right: auto;",
+                width = "75%",
+                height = "75%"  
+            )
+    })
+    
+    ####################################################################################
+    
+    ######## 5) sensitivity analysis results ###########################################
     # set reactive element turning input number into proportion
     prop <- reactive({
         input$top_sites / 100
