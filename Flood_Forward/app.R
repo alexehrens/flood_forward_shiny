@@ -392,7 +392,7 @@ ui <- fluidPage(
           sidebarLayout(
               sidebarPanel(
                  radioButtons(
-                     "tradeoff",
+                     inputId = "tradeoff",
                      "Select desired multiple-benefit tradeoff scenario",
                      choices = c("Flood Risk Reduction" = "floods100", 
                                  "Equal Weighting" = "equal50", 
@@ -400,10 +400,10 @@ ui <- fluidPage(
                                  ),
                      selected = ("Equal Weighting" = "equal50")
                  ), 
-                 "The Flood Risk Reduction scenario corresponds to multiple-benefit weighting of 100% to flood risk reduction and 0% ecosystem enhancement. The Ecosystem Enhancement scenario corresponds to weighting of 0% to flood risk and 100% to ecosystems. The Equal Weighting scenario assigns 50% weighting to both co-benefits."
+                 "The Flood Risk Reduction scenario corresponds to multiple-benefit weighting of 100% to flood risk reduction and 0% ecosystem enhancement. The Ecosystem Enhancement scenario corresponds to weighting of 0% to flood risk and 100% to ecosystems. The Equal Weighting scenario assigns 50% weighting to both co-benefits. Plots display the top 10 largest contiguous areas of high priority sites from each scenario."
               ),
               mainPanel(
-                  imageOutput("tradeoff_image")
+                  uiOutput("tradeoff_image")
               )
           )),
         tabPanel(
@@ -552,7 +552,7 @@ server <- function(input, output) {
                 style = "display: block; margin-left: auto; margin-right: auto;",
                 width = "75%",
                 height = "75%")
-        else if(tradeoff_select()=="floodplains100")
+        else if(tradeoff_select()=="ecosystems100")
             img(
                 src = "ecosystems_final_output_top10.png",
                 style = "display: block; margin-left: auto; margin-right: auto;",
